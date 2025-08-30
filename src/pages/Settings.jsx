@@ -8,6 +8,7 @@ import {supabase} from '../lib/superbase.js';
 import {useTenant} from '../context/TenantContext.jsx';
 import {listTypes, addType, deleteType} from '../features/types/api.js';
 import BrandingUpload from '../features/settings/BrandingUpload.jsx';
+import SubscriptionManager from '../features/subscription/SubscriptionManager.jsx';
 
 // NEW: drag-and-drop designer you already installed
 import TemplateDesigner from '../features/email/TemplateDesigner.jsx';
@@ -484,7 +485,8 @@ export default function Settings(){
     { id: 'types', label: 'Custom Types' },
     { id: 'webhooks', label: 'Webhooks' },
     { id: 'exports', label: 'Data & Exports' },
-    { id: 'email', label: 'Email Templates' }
+    { id: 'email', label: 'Email Templates' },
+    { id: 'subscription', label: 'Subscription' }
   ];
 
   // ---------- Email Preview helpers ----------
@@ -841,6 +843,11 @@ export default function Settings(){
             Available tags include: <code>{'{{business.name}} {{business.email}} {{business.logo_url}} {{date}} {{pdf_url}} {{invoice.code}} {{customer.name}} {{money.subtotal}} {{money.tax}} {{money.discount}} {{money.deposit}} {{money.grand}} {{po.code}} {{po.items_count}} {{vendor.name}}'}</code>
           </div>
         </div>
+      )}
+
+      {/* Subscription */}
+      {activeTab === 'subscription' && (
+        <SubscriptionManager />
       )}
 
       {/* NEW: Designer modal (small, reuses your modal classes) */}

@@ -415,20 +415,160 @@ body.sidebar-collapsed { padding-left: 60px; }
           padding: 10px;
           text-align: center;
           border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
-        .logo-title {
-          font-size: 12px;
-          font-weight: bold;
+        /* User Icon Styles */
+        .user-icon-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .user-icon {
+          width: 40px;
+          height: 40px;
+          background: #f3f4f6;
+          border: 2px solid #e5e7eb;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+          position: relative;
+        }
+
+        .user-icon::after {
+          content: '';
+          position: absolute;
+          right: -6px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 0;
+          height: 0;
+          border-left: 4px solid #9ca3af;
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          opacity: 0.6;
+          transition: opacity 0.3s ease;
+        }
+
+        .user-icon:hover::after {
+          opacity: 1;
+        }
+
+        .user-icon:hover {
+          background: #e5e7eb;
+          border-color: #d1d5db;
+          transform: scale(1.05);
+        }
+
+        .user-icon i {
+          font-size: 16px;
+          color: #6b7280;
+          transition: color 0.3s ease;
+        }
+
+        .user-icon:hover i {
+          color: #374151;
+        }
+
+        /* User Dropdown Menu */
+        .user-dropdown {
+          position: absolute;
+          top: 50%;
+          left: 100%;
+          margin-left: 12px;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+          min-width: 200px;
+          z-index: 1002;
+          overflow: hidden;
+          animation: dropdownFadeIn 0.2s ease-out;
+          transform: translateY(-50%);
+        }
+
+        @keyframes dropdownFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .user-info {
+          padding: 16px;
+          background: #f9fafb;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-name {
+          font-size: 14px;
+          font-weight: 600;
           color: #1f2937;
-          margin-bottom: 2px;
+          margin-bottom: 4px;
+          word-break: break-word;
         }
 
-        .logo-subtitle {
-          font-size: 10px;
+        .user-role {
+          font-size: 12px;
           color: #6b7280;
         }
 
+        .dropdown-divider {
+          height: 1px;
+          background: #e5e7eb;
+          margin: 0;
+        }
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          padding: 12px 16px;
+          background: none;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          font-size: 14px;
+          color: #374151;
+        }
+
+        .dropdown-item:hover {
+          background: #f3f4f6;
+        }
+
+        .dropdown-item.logout-btn {
+          color: #dc2626;
+        }
+
+        .dropdown-item.logout-btn:hover {
+          background: #fef2f2;
+        }
+
+        .dropdown-item i {
+          font-size: 14px;
+          width: 16px;
+          text-align: center;
+        }
+
+        .dropdown-item span {
+          font-weight: 500;
+        }
+
+        /* Collapse Toggle Button */
         .collapse-toggle {
           position: absolute;
           top: 15px;
@@ -458,6 +598,7 @@ body.sidebar-collapsed { padding-left: 60px; }
           transition: transform 0.3s ease;
         }
 
+        /* Floating Nav Collapsed State */
         .floating-nav.collapsed {
           transform: translateY(-50%) translateX(-100px);
           opacity: 0.3;
@@ -470,6 +611,25 @@ body.sidebar-collapsed { padding-left: 60px; }
 
         .floating-nav.collapsed .collapse-toggle i {
           transform: rotate(180deg);
+        }
+
+        /* Responsive adjustments for user icon */
+        @media (max-width: 768px) {
+          .user-dropdown {
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            margin-left: 0;
+            margin-top: 12px;
+          }
+        }
+
+        /* Ensure dropdown doesn't go off-screen on very small devices */
+        @media (max-width: 480px) {
+          .user-dropdown {
+            min-width: 160px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+          }
         }
 
 /* Apple-Style Shop Equipment Styles - Add to your app.css */
@@ -722,5 +882,202 @@ body.sidebar-collapsed { padding-left: 60px; }
   .edit-btn,
   .delete-btn {
     width: 100%;
+  }
+}
+
+/* Subscription Management Styles */
+.subscription-overview {
+  margin-top: 16px;
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.subscription-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.subscription-description {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.subscription-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.trial {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.inactive {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.status-badge.past-due {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.status-badge.canceled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.subscription-details {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #475569;
+  font-size: 14px;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.subscription-actions {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.trial-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+}
+
+.trial-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.trial-content h5 {
+  margin: 0 0 8px 0;
+  color: #92400e;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.trial-content p {
+  margin: 0;
+  color: #92400e;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.subscription-features {
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.subscription-features h5 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.subscription-features ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subscription-features li {
+  padding: 8px 0;
+  color: #475569;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.subscription-features li:last-child {
+  border-bottom: none;
+}
+
+.subscription-features li::before {
+  content: "✓";
+  color: #10b981;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* Responsive adjustments for subscription */
+@media (max-width: 768px) {
+  .subscription-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .subscription-status {
+    align-self: flex-start;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .trial-notice {
+    flex-direction: column;
+    text-align: center;
   }
 }
