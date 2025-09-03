@@ -67,10 +67,26 @@ export default function SideNav() {
     if (userProfile?.role) {
       return userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1);
     }
-    return "Administrator";
+    return "User";
   };
 
-  const menuItems = [
+  // Check if user is admin
+  const isAdmin = () => {
+    if (!userProfile) return false;
+    
+    const adminEmails = [
+      'admin@shopmanager.com',
+      'pasha@shopmanager.com',
+      // Add your admin emails here
+    ];
+
+    const isAdminByRole = userProfile.role === 'admin' || userProfile.role === 'owner';
+    const isAdminByEmail = adminEmails.includes(userProfile.email?.toLowerCase());
+
+    return isAdminByRole || isAdminByEmail;
+  };
+
+  const baseMenuItems = [
     { to: "/dashboard", icon: "fa-solid fa-gauge-high", label: "Dashboard" },
     { to: "/quotes", icon: "fa-solid fa-file-pen", label: "Quotes" },
     { to: "/jobs", icon: "fa-solid fa-briefcase", label: "Jobs" },
@@ -85,6 +101,13 @@ export default function SideNav() {
     { to: "/reports", icon: "fa-solid fa-chart-line", label: "Reports" },
     { to: "/settings", icon: "fa-solid fa-gear", label: "Settings" }
   ];
+
+  // Add admin-only menu items
+  const adminMenuItems = [
+    { to: "/tenant-manager", icon: "fa-solid fa-users-cog", label: "Tenant Manager" }
+  ];
+
+  const menuItems = isAdmin() ? [...baseMenuItems, ...adminMenuItems] : baseMenuItems;
 
   return (
     <>

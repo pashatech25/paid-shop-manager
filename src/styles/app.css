@@ -1,5 +1,127 @@
 /* ---------- Base / Reset ---------- */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 * { box-sizing: border-box; }
+
+/* ---------- Status Badges ---------- */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background: var(--success);
+  color: white;
+}
+
+.status-badge.trial {
+  background: var(--warning);
+  color: #000;
+}
+
+.status-badge.expired {
+  background: var(--danger);
+  color: white;
+}
+
+.status-badge.canceled {
+  background: #6c757d;
+  color: white;
+}
+
+.status-badge.past-due {
+  background: #fd7e14;
+  color: white;
+}
+
+.status-badge.inactive {
+  background: #6c757d;
+  color: white;
+}
+
+.status-badge.free {
+  background: #17a2b8;
+  color: white;
+}
+
+/* ---------- Tenant Manager Styles ---------- */
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tenant-info {
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.info-row span {
+  color: var(--muted);
+}
+
+.action-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.action-group h4 {
+  margin: 0 0 10px 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 :root {
   --bg: #f4f7fa;
   --surface: #fff;

@@ -24,7 +24,7 @@ export default function SubscriptionManager() {
       // Load tenant subscription info
       const { data: tenantData } = await supabase
         .from('tenants')
-        .select('plan_code, plan_status, stripe_customer_id, stripe_subscription_id, current_period_end, created_at')
+        .select('plan_code, plan_status, stripe_customer_id, stripe_subscription_id, current_period_end, created_at, subscription_status, trial_ends_at, trial_end_date, trial_started_at')
         .eq('id', tenantId)
         .single();
 
@@ -32,10 +32,10 @@ export default function SubscriptionManager() {
         setSubscription(tenantData);
         
         // Calculate trial days left
-        if (tenantData.plan_status === 'inactive' || tenantData.plan_status === 'trialing' || !tenantData.stripe_subscription_id) {
-          const createdAt = new Date(tenantData.created_at);
+        if (tenantData.subscription_status === 'trial' || tenantData.plan_status === 'inactive' || !tenantData.stripe_subscription_id) {
           const now = new Date();
-          const trialEnd = tenantData.trial_end_date ? new Date(tenantData.trial_end_date) : new Date(createdAt.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 days
+          const trialEndTime = tenantData.trial_ends_at || tenantData.trial_end_date;
+          const trialEnd = trialEndTime ? new Date(trialEndTime) : new Date(tenantData.created_at).getTime() + (48 * 60 * 60 * 1000); // 48 hours
           const daysLeft = Math.max(0, Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24)));
           setTrialDaysLeft(daysLeft);
         }
@@ -134,13 +134,13 @@ export default function SubscriptionManager() {
   };
 
   const getStatusBadge = () => {
-    if (subscription?.plan_status === 'active') {
+    if (subscription?.subscription_status === 'active' || subscription?.plan_status === 'active') {
       return <span className="status-badge active">Active</span>;
-    } else if (subscription?.plan_status === 'past_due') {
+    } else if (subscription?.subscription_status === 'past_due' || subscription?.plan_status === 'past_due') {
       return <span className="status-badge past-due">Past Due</span>;
-    } else if (subscription?.plan_status === 'canceled') {
+    } else if (subscription?.subscription_status === 'canceled' || subscription?.plan_status === 'canceled') {
       return <span className="status-badge canceled">Canceled</span>;
-    } else if (trialDaysLeft > 0) {
+    } else if (subscription?.subscription_status === 'trial' && trialDaysLeft > 0) {
       return <span className="status-badge trial">Trial ({trialDaysLeft} days left)</span>;
     } else {
       return <span className="status-badge inactive">Inactive</span>;
@@ -172,7 +172,7 @@ export default function SubscriptionManager() {
           <div className="subscription-info">
             <h4>Current Plan: {plan?.name || 'Free Trial'}</h4>
             <p className="subscription-description">
-              {plan?.description || '3-day free trial, then $10/month'}
+              {plan?.description || '48-hour free trial, then $10/month'}
             </p>
           </div>
           <div className="subscription-status">
@@ -188,7 +188,7 @@ export default function SubscriptionManager() {
           <div className="detail-row">
             <span className="detail-label">Price:</span>
             <span className="detail-value">
-              {plan ? `$${(plan.price_monthly_cents / 100).toFixed(2)}/month` : 'Free for 3 days'}
+              {plan ? `$${(plan.price_monthly_cents / 100).toFixed(2)}/month` : 'Free for 48 hours'}
             </span>
           </div>
           <div className="detail-row">
@@ -210,7 +210,7 @@ export default function SubscriptionManager() {
         </div>
 
         <div className="subscription-actions">
-          {!subscription?.stripe_subscription_id || subscription?.plan_status === 'canceled' ? (
+          {!subscription?.stripe_subscription_id || subscription?.subscription_status === 'canceled' || subscription?.plan_status === 'canceled' ? (
             <button
               className="btn btn-primary"
               onClick={createCheckoutSession}
@@ -218,7 +218,7 @@ export default function SubscriptionManager() {
             >
               {stripeLoading ? 'Processing...' : 'Subscribe Now - $10/month'}
             </button>
-          ) : subscription?.plan_status === 'active' ? (
+          ) : subscription?.subscription_status === 'active' || subscription?.plan_status === 'active' ? (
             <button
               className="btn btn-secondary"
               onClick={cancelSubscription}
