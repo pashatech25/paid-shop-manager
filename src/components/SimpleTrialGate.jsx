@@ -72,6 +72,9 @@ const SimpleTrialGate = ({ children }) => {
   // Check for subscription success parameter
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    console.log('URL params:', window.location.search);
+    console.log('Subscription param:', urlParams.get('subscription'));
+    
     if (urlParams.get('subscription') === 'success') {
       console.log('Subscription success detected, updating status...');
       updateSubscriptionStatus();
@@ -427,6 +430,27 @@ const SimpleTrialGate = ({ children }) => {
           onMouseOut={(e) => e.target.style.background = 'var(--primary)'}
         >
           Subscribe Now - $10/month
+        </button>
+
+        {/* Manual Refresh Button for Testing */}
+        <button
+          onClick={() => {
+            console.log('Manual refresh clicked');
+            updateSubscriptionStatus();
+          }}
+          style={{
+            width: '100%',
+            background: 'var(--muted)',
+            color: 'white',
+            border: 'none',
+            borderRadius: 'var(--radius)',
+            padding: '10px 20px',
+            fontSize: '14px',
+            cursor: 'pointer',
+            marginBottom: '15px'
+          }}
+        >
+          🔄 Refresh Status (Test)
         </button>
 
         {/* Footer */}
