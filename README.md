@@ -1,2 +1,15 @@
-# YOURREPO
-# Force Vercel deployment - Sat Aug 30 18:12:36 EDT 2025
+# Shop Manager - Paid Version
+
+Shop Manager with subscription system and tenant management.
+
+## Features
+- Multi-tenant architecture
+- Stripe subscription integration
+- 48-hour free trial
+- Admin tenant management
+- Real-time notifications
+
+## Environment Variables
+Make sure to configure all required environment variables in Vercel.
+
+Updated: $(date)
