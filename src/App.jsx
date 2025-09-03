@@ -15,6 +15,7 @@ import Shop from "./pages/Shop.jsx";
 import Inventory from "./pages/Inventory.jsx";
 import PurchaseOrders from "./pages/PurchaseOrders.jsx";
 import AdminSubscriptions from "./pages/AdminSubscriptions.jsx";
+import AdminBypass from "./pages/AdminBypass.jsx";
 
 import AuthGate from "./components/AuthGate.jsx";
 import SubscriptionGate from "./components/SubscriptionGate.jsx";
@@ -30,6 +31,11 @@ export default function App(){
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login/>}/>
+        <Route path="/admin-bypass" element={
+          <AuthGate>
+            <AdminBypass/>
+          </AuthGate>
+        }/>
         <Route
           path="/*"
           element={
