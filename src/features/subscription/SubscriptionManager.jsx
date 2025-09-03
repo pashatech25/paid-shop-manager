@@ -66,14 +66,14 @@ export default function SubscriptionManager() {
       setStripeLoading(true);
       
       // Create Stripe checkout session using Vercel API
-      const response = await fetch('/api/stripe/create-checkout-session', {
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           tenantId,
-          priceId: process.env.REACT_APP_STRIPE_PRICE_ID || 'price_1234567890', // Default fallback
+          priceId: import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1234567890', // Default fallback
           successUrl: `${window.location.origin}/settings?tab=subscription&success=true`,
           cancelUrl: `${window.location.origin}/settings?tab=subscription&canceled=true`,
         }),
@@ -86,7 +86,7 @@ export default function SubscriptionManager() {
       }
 
       // Redirect to Stripe Checkout
-      const stripe = window.Stripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+      const stripe = window.Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
       const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
       
       if (stripeError) {
@@ -104,7 +104,7 @@ export default function SubscriptionManager() {
     try {
       setStripeLoading(true);
       
-      const response = await fetch('/api/stripe/cancel-subscription', {
+      const response = await fetch('/api/cancel-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
