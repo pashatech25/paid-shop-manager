@@ -29,6 +29,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Processing webhook event:', event.type);
+    
     switch (event.type) {
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object);
@@ -58,10 +60,12 @@ export default async function handler(req, res) {
         console.log(`Unhandled event type: ${event.type}`);
     }
 
+    console.log('Webhook processed successfully');
     res.status(200).json({ received: true });
   } catch (error) {
     console.error('Error processing webhook:', error);
-    res.status(500).json({ error: 'Webhook processing failed' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Webhook processing failed', details: error.message });
   }
 }
 
@@ -149,36 +153,54 @@ async function handleSubscriptionDeleted(subscription) {
 }
 
 async function handlePaymentSucceeded(invoice) {
-  const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
-  const tenantId = subscription.metadata?.tenant_id;
-  if (!tenantId) return;
-
-  const { error } = await supabase
-    .from('subscription_payments')
-    .insert({
-      tenant_id: tenantId,
-      stripe_invoice_id: invoice.id,
-      stripe_payment_intent_id: invoice.payment_intent,
-      amount_cents: invoice.amount_paid,
-      currency: invoice.currency,
-      status: 'succeeded'
-    });
-
-  if (error) {
-    console.error('Error recording payment:', error);
-  } else {
-    console.log('Payment succeeded recorded');
+  console.log('Processing invoice.payment_succeeded:', invoice.id);
+  
+  // Get tenant ID from invoice metadata or subscription metadata
+  let tenantId = invoice.metadata?.tenant_id;
+  
+  if (!tenantId && invoice.subscription) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+      tenantId = subscription.metadata?.tenant_id;
+      console.log('Retrieved tenant ID from subscription:', tenantId);
+    } catch (err) {
+      console.error('Error retrieving subscription:', err);
+    }
+  }
+  
+  if (!tenantId) {
+    console.log('No tenant ID found in invoice or subscription metadata');
+    return;
   }
 
-  const { error: tenantUpdateError } = await supabase
+  console.log('Updating tenant subscription status for tenant:', tenantId);
+
+  // Update tenant with subscription info
+  const updateData = {
+    subscription_status: 'active',
+    trial_ends_at: null,
+    trial_end_date: null
+  };
+
+  // Add subscription ID if available
+  if (invoice.subscription) {
+    updateData.stripe_subscription_id = invoice.subscription;
+  }
+
+  // Add customer ID if available
+  if (invoice.customer) {
+    updateData.stripe_customer_id = invoice.customer;
+  }
+
+  const { error } = await supabase
     .from('tenants')
-    .update({ subscription_status: 'active' })
+    .update(updateData)
     .eq('id', tenantId);
 
-  if (tenantUpdateError) {
-    console.error('Error updating tenant status after payment success:', tenantUpdateError);
+  if (error) {
+    console.error('Error updating tenant after payment success:', error);
   } else {
-    console.log('Tenant status updated to active after payment success');
+    console.log('Tenant updated successfully after payment success');
   }
 }
 
