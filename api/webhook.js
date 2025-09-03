@@ -174,9 +174,22 @@ async function handleSubscriptionDeleted(subscription) {
 
 async function handlePaymentSucceeded(invoice) {
   console.log('Processing invoice.payment_succeeded:', invoice.id);
+  console.log('Invoice data:', JSON.stringify(invoice, null, 2));
   
   // Get tenant ID from invoice metadata or subscription metadata
   let tenantId = invoice.metadata?.tenant_id;
+  
+  // Check subscription_details metadata
+  if (!tenantId && invoice.subscription_details?.metadata?.tenant_id) {
+    tenantId = invoice.subscription_details.metadata.tenant_id;
+    console.log('Found tenant ID in subscription_details:', tenantId);
+  }
+  
+  // Check lines metadata
+  if (!tenantId && invoice.lines?.data?.[0]?.metadata?.tenant_id) {
+    tenantId = invoice.lines.data[0].metadata.tenant_id;
+    console.log('Found tenant ID in lines metadata:', tenantId);
+  }
   
   if (!tenantId && invoice.subscription) {
     try {
@@ -190,6 +203,11 @@ async function handlePaymentSucceeded(invoice) {
   
   if (!tenantId) {
     console.log('No tenant ID found in invoice or subscription metadata');
+    console.log('Available metadata:', {
+      invoice_metadata: invoice.metadata,
+      subscription_details: invoice.subscription_details,
+      lines_metadata: invoice.lines?.data?.[0]?.metadata
+    });
     return;
   }
 
@@ -212,15 +230,20 @@ async function handlePaymentSucceeded(invoice) {
     updateData.stripe_customer_id = invoice.customer;
   }
 
-  const { error } = await supabase
+  console.log('Update data:', updateData);
+
+  const { data, error } = await supabase
     .from('tenants')
     .update(updateData)
-    .eq('id', tenantId);
+    .eq('id', tenantId)
+    .select();
 
   if (error) {
     console.error('Error updating tenant after payment success:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
   } else {
     console.log('Tenant updated successfully after payment success');
+    console.log('Updated tenant data:', data);
   }
 }
 
