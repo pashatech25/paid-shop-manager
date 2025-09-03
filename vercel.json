@@ -17,10 +17,5 @@
     "api/*.js": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "STRIPE_SECRET_KEY": "@STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET": "@STRIPE_WEBHOOK_SECRET",
-    "SUPABASE_SERVICE_ROLE_KEY": "@SUPABASE_SERVICE_ROLE_KEY"
   }
 }
