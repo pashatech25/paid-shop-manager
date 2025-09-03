@@ -9,6 +9,13 @@ export default function TenantManager() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    trial: 0,
+    expired: 0,
+    free: 0
+  });
 
   useEffect(() => {
     loadTenants();
@@ -59,6 +66,16 @@ export default function TenantManager() {
 
       const tenantList = Object.values(tenantMap);
       setTenants(tenantList);
+      
+      // Calculate stats
+      const newStats = {
+        total: tenantList.length,
+        active: tenantList.filter(t => t.subscription_status === 'active' && t.subscription_required).length,
+        trial: tenantList.filter(t => t.subscription_status === 'trial').length,
+        expired: tenantList.filter(t => t.subscription_status === 'trial' && t.trial_ends_at && new Date(t.trial_ends_at) < new Date()).length,
+        free: tenantList.filter(t => !t.subscription_required).length
+      };
+      setStats(newStats);
       
     } catch (error) {
       console.error('Error loading tenants:', error);
@@ -192,8 +209,11 @@ export default function TenantManager() {
     return (
       <div className="section">
         <div className="section-header">
-          <h2>Tenant Manager</h2>
-          <span className="tiny">Loading tenants...</span>
+          <h2>🏢 Tenant Manager</h2>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <span>Loading tenants...</span>
+          </div>
         </div>
       </div>
     );
@@ -201,34 +221,78 @@ export default function TenantManager() {
 
   return (
     <div className="section">
+      {/* Header */}
       <div className="section-header">
-        <h2>Tenant Manager</h2>
+        <div className="header-left">
+          <h2>🏢 Tenant Manager</h2>
+          <p className="section-description">Manage all tenant accounts, subscriptions, and access levels</p>
+        </div>
         <div className="header-actions">
           <button 
             className="btn btn-primary"
             onClick={loadTenants}
           >
-            Refresh
+            🔄 Refresh
           </button>
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon">📊</div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.total}</div>
+            <div className="stat-label">Total Tenants</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">✅</div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.active}</div>
+            <div className="stat-label">Active Subscriptions</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">⏰</div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.trial}</div>
+            <div className="stat-label">On Trial</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">⚠️</div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.expired}</div>
+            <div className="stat-label">Trial Expired</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">🆓</div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.free}</div>
+            <div className="stat-label">Free Access</div>
+          </div>
+        </div>
+      </div>
+
       {/* Filters */}
-      <div className="filters" style={{ marginBottom: '20px' }}>
+      <div className="filters-card">
         <div className="filter-group">
-          <input
-            type="text"
-            placeholder="Search tenants or users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input"
-            style={{ width: '300px' }}
-          />
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Search by tenant name, user email, or name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="input"
-            style={{ width: '150px', marginLeft: '10px' }}
+            className="filter-select"
           >
             <option value="all">All Status</option>
             <option value="trial">Trial</option>
@@ -240,12 +304,16 @@ export default function TenantManager() {
       </div>
 
       {/* Tenants Table */}
-      <div className="card">
+      <div className="tenants-card">
+        <div className="card-header">
+          <h3>📋 Tenant Overview</h3>
+          <span className="result-count">{filteredTenants.length} of {tenants.length} tenants</span>
+        </div>
         <div className="table-container">
-          <table className="table">
+          <table className="tenants-table">
             <thead>
               <tr>
-                <th>Tenant Name</th>
+                <th>Tenant</th>
                 <th>Users</th>
                 <th>Status</th>
                 <th>Trial</th>
@@ -255,48 +323,56 @@ export default function TenantManager() {
             </thead>
             <tbody>
               {filteredTenants.map(tenant => (
-                <tr key={tenant.id}>
-                  <td>
-                    <div>
+                <tr key={tenant.id} className="tenant-row">
+                  <td className="tenant-info">
+                    <div className="tenant-name">
                       <strong>{tenant.name}</strong>
-                      <div className="tiny" style={{ color: 'var(--muted)' }}>
-                        ID: {tenant.id.slice(0, 8)}...
-                      </div>
+                      <div className="tenant-id">ID: {tenant.id.slice(0, 8)}...</div>
                     </div>
                   </td>
-                  <td>
-                    <div>
-                      {tenant.users.map((user, index) => (
-                        <div key={user.user_id} className="tiny">
-                          {user.name || user.email || 'Unknown User'}
-                          {index < tenant.users.length - 1 && ', '}
-                        </div>
-                      ))}
+                  <td className="users-cell">
+                    <div className="users-list">
+                      {tenant.users.length > 0 ? (
+                        tenant.users.map((user, index) => (
+                          <div key={user.user_id} className="user-item">
+                            <div className="user-avatar">
+                              {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || '?'}
+                            </div>
+                            <div className="user-details">
+                              <div className="user-name">{user.name || 'Unknown User'}</div>
+                              <div className="user-email">{user.email}</div>
+                              {user.role && <div className="user-role">{user.role}</div>}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="no-users">No users</div>
+                      )}
                     </div>
                   </td>
-                  <td>{getStatusBadge(tenant)}</td>
-                  <td>
-                    <div className="tiny">
+                  <td className="status-cell">
+                    {getStatusBadge(tenant)}
+                  </td>
+                  <td className="trial-cell">
+                    <div className="trial-info">
                       {getTrialTimeLeft(tenant)}
                     </div>
                   </td>
-                  <td>
-                    <div className="tiny">
+                  <td className="created-cell">
+                    <div className="date-info">
                       {new Date(tenant.created_at).toLocaleDateString()}
                     </div>
                   </td>
-                  <td>
-                    <div className="btn-group">
-                      <button
-                        className="btn btn-sm btn-secondary"
-                        onClick={() => {
-                          setSelectedTenant(tenant);
-                          setShowModal(true);
-                        }}
-                      >
-                        Manage
-                      </button>
-                    </div>
+                  <td className="actions-cell">
+                    <button
+                      className="btn btn-sm btn-primary manage-btn"
+                      onClick={() => {
+                        setSelectedTenant(tenant);
+                        setShowModal(true);
+                      }}
+                    >
+                      ⚙️ Manage
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -308,113 +384,158 @@ export default function TenantManager() {
       {/* Management Modal */}
       {showModal && selectedTenant && (
         <div className="modal" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content tenant-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Manage Tenant: {selectedTenant.name}</h3>
+              <div className="modal-title">
+                <h3>⚙️ Manage Tenant</h3>
+                <div className="tenant-title">{selectedTenant.name}</div>
+              </div>
               <button 
-                className="btn btn-sm btn-secondary"
+                className="modal-close"
                 onClick={() => setShowModal(false)}
               >
-                ×
+                ✕
               </button>
             </div>
 
             <div className="modal-body">
-              <div className="tenant-info">
-                <div className="info-row">
-                  <label>Current Status:</label>
-                  <span>{getStatusBadge(selectedTenant)}</span>
-                </div>
-                <div className="info-row">
-                  <label>Trial Status:</label>
-                  <span>{getTrialTimeLeft(selectedTenant)}</span>
-                </div>
-                <div className="info-row">
-                  <label>Subscription Required:</label>
-                  <span>{selectedTenant.subscription_required ? 'Yes' : 'No'}</span>
-                </div>
-                <div className="info-row">
-                  <label>Stripe Customer ID:</label>
-                  <span className="tiny">{selectedTenant.stripe_customer_id || 'None'}</span>
+              {/* Tenant Info Section */}
+              <div className="tenant-info-section">
+                <h4>📊 Current Status</h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>Status:</label>
+                    <span>{getStatusBadge(selectedTenant)}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Trial Status:</label>
+                    <span className="trial-status">{getTrialTimeLeft(selectedTenant)}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Subscription Required:</label>
+                    <span className={selectedTenant.subscription_required ? 'required' : 'not-required'}>
+                      {selectedTenant.subscription_required ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <label>Stripe Customer ID:</label>
+                    <span className="stripe-id">{selectedTenant.stripe_customer_id || 'None'}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Stripe Subscription ID:</label>
+                    <span className="stripe-id">{selectedTenant.stripe_subscription_id || 'None'}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Created:</label>
+                    <span>{new Date(selectedTenant.created_at).toLocaleDateString()}</span>
+                  </div>
                 </div>
               </div>
 
+              {/* Users Section */}
+              <div className="users-section">
+                <h4>👥 Users ({selectedTenant.users.length})</h4>
+                <div className="users-grid">
+                  {selectedTenant.users.map(user => (
+                    <div key={user.user_id} className="user-card">
+                      <div className="user-avatar-large">
+                        {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                      <div className="user-info">
+                        <div className="user-name">{user.name || 'Unknown User'}</div>
+                        <div className="user-email">{user.email}</div>
+                        {user.role && <div className="user-role-badge">{user.role}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Groups */}
               <div className="action-groups">
                 <div className="action-group">
-                  <h4>Trial Management</h4>
-                  <div className="btn-row">
+                  <h4>⏰ Trial Management</h4>
+                  <div className="btn-grid">
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-primary action-btn"
                       onClick={() => extendTrial(selectedTenant.id, 7)}
                     >
-                      Extend Trial +7 days
+                      <span className="btn-icon">📅</span>
+                      <span>Extend +7 days</span>
                     </button>
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-primary action-btn"
                       onClick={() => extendTrial(selectedTenant.id, 30)}
                     >
-                      Extend Trial +30 days
+                      <span className="btn-icon">📅</span>
+                      <span>Extend +30 days</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="action-group">
-                  <h4>Access Control</h4>
-                  <div className="btn-row">
+                  <h4>🔐 Access Control</h4>
+                  <div className="btn-grid">
                     <button
-                      className="btn btn-sm btn-success"
+                      className="btn btn-success action-btn"
                       onClick={() => setFreeAccess(selectedTenant.id)}
                     >
-                      Grant Free Access
+                      <span className="btn-icon">🆓</span>
+                      <span>Grant Free Access</span>
                     </button>
                     <button
-                      className="btn btn-sm btn-warning"
+                      className="btn btn-warning action-btn"
                       onClick={() => setPaidAccess(selectedTenant.id)}
                     >
-                      Require Paid Access
+                      <span className="btn-icon">💰</span>
+                      <span>Require Paid Access</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="action-group">
-                  <h4>Subscription Management</h4>
-                  <div className="btn-row">
+                  <h4>💳 Subscription Management</h4>
+                  <div className="btn-grid">
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-primary action-btn"
                       onClick={() => updateTenantStatus(selectedTenant.id, { subscription_status: 'active' })}
                     >
-                      Activate Subscription
+                      <span className="btn-icon">✅</span>
+                      <span>Activate Subscription</span>
                     </button>
                     <button
-                      className="btn btn-sm btn-danger"
+                      className="btn btn-danger action-btn"
                       onClick={() => cancelSubscription(selectedTenant.id)}
                     >
-                      Cancel Subscription
+                      <span className="btn-icon">❌</span>
+                      <span>Cancel Subscription</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="action-group">
-                  <h4>Reset Options</h4>
-                  <div className="btn-row">
+                  <h4>🔄 Reset Options</h4>
+                  <div className="btn-grid">
                     <button
-                      className="btn btn-sm btn-secondary"
+                      className="btn btn-secondary action-btn"
                       onClick={() => updateTenantStatus(selectedTenant.id, { 
                         subscription_status: 'trial',
                         trial_ends_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
                       })}
                     >
-                      Reset to 48h Trial
+                      <span className="btn-icon">🔄</span>
+                      <span>Reset to 48h Trial</span>
                     </button>
                     <button
-                      className="btn btn-sm btn-secondary"
+                      className="btn btn-secondary action-btn"
                       onClick={() => updateTenantStatus(selectedTenant.id, { 
                         subscription_status: 'inactive',
                         trial_ends_at: null,
                         trial_end_date: null
                       })}
                     >
-                      Set Inactive
+                      <span className="btn-icon">⏸️</span>
+                      <span>Set Inactive</span>
                     </button>
                   </div>
                 </div>
