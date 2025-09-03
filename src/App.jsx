@@ -14,6 +14,7 @@ import Login from "./pages/Login.jsx";
 import Shop from "./pages/Shop.jsx";
 import Inventory from "./pages/Inventory.jsx";
 import PurchaseOrders from "./pages/PurchaseOrders.jsx";
+import AdminSubscriptions from "./pages/AdminSubscriptions.jsx";
 
 import AuthGate from "./components/AuthGate.jsx";
 import SubscriptionGate from "./components/SubscriptionGate.jsx";
@@ -53,6 +54,7 @@ export default function App(){
                       <Route path="reports" element={<Reports/>}/>
                       <Route path="settings" element={<Settings/>}/>
                       <Route path="shop" element={<Shop/>}/>
+                      <Route path="admin/subscriptions" element={<AdminSubscriptions/>}/>
                       <Route path="*" element={<div className="container">Not Found</div>} />
                     </Routes>
                   </Layout>
