@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/superbase.js';
+import { supabase } from '../../lib/supabaseClient.js';
 import { useTenant } from '../../context/TenantContext.jsx';
 import { toast } from 'react-toastify';
 
@@ -32,10 +32,10 @@ export default function SubscriptionManager() {
         setSubscription(tenantData);
         
         // Calculate trial days left
-        if (tenantData.plan_status === 'inactive' || !tenantData.stripe_subscription_id) {
+        if (tenantData.plan_status === 'inactive' || tenantData.plan_status === 'trialing' || !tenantData.stripe_subscription_id) {
           const createdAt = new Date(tenantData.created_at);
           const now = new Date();
-          const trialEnd = new Date(createdAt.getTime() + (48 * 60 * 60 * 1000)); // 48 hours
+          const trialEnd = tenantData.trial_end_date ? new Date(tenantData.trial_end_date) : new Date(createdAt.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 days
           const daysLeft = Math.max(0, Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24)));
           setTrialDaysLeft(daysLeft);
         }
@@ -172,7 +172,7 @@ export default function SubscriptionManager() {
           <div className="subscription-info">
             <h4>Current Plan: {plan?.name || 'Free Trial'}</h4>
             <p className="subscription-description">
-              {plan?.description || '48-hour free trial, then $10/month'}
+              {plan?.description || '3-day free trial, then $10/month'}
             </p>
           </div>
           <div className="subscription-status">
@@ -188,7 +188,7 @@ export default function SubscriptionManager() {
           <div className="detail-row">
             <span className="detail-label">Price:</span>
             <span className="detail-value">
-              {plan ? `$${(plan.price_monthly_cents / 100).toFixed(2)}/month` : 'Free for 48 hours'}
+              {plan ? `$${(plan.price_monthly_cents / 100).toFixed(2)}/month` : 'Free for 3 days'}
             </span>
           </div>
           <div className="detail-row">

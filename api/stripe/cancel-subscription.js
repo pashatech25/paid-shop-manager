@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -20,6 +19,10 @@ export default async function handler(req, res) {
       cancel_at_period_end: true,
     });
 
+    // Update tenant status in database
+    // Note: This would typically be done via a webhook, but for immediate UI feedback
+    // we can update it here. In production, rely on webhooks for accuracy.
+    
     res.status(200).json({ 
       success: true, 
       message: 'Subscription will be canceled at the end of the current period',

@@ -1,11 +1,10 @@
 import Stripe from 'stripe';
-import { supabase } from '../../lib/supabaseClient.js';
+import { supabase } from '../../lib/superbase.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -75,13 +74,20 @@ async function handleSubscriptionCreated(subscription) {
   const tenantId = subscription.metadata?.tenant_id;
   if (!tenantId) return;
 
+  // Calculate trial end date if in trial
+  let trialEndDate = null;
+  if (subscription.status === 'trialing' && subscription.trial_end) {
+    trialEndDate = new Date(subscription.trial_end * 1000).toISOString();
+  }
+
   // Update tenant with subscription details
   await supabase
     .from('tenants')
     .update({ 
       stripe_subscription_id: subscription.id,
       plan_status: subscription.status,
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString()
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      trial_end_date: trialEndDate || undefined
     })
     .eq('id', tenantId);
 }

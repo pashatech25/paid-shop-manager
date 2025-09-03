@@ -1,0 +1,218 @@
+/* Subscription Gate Styles */
+
+.subscription-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.subscription-required-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.subscription-required-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 48px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.subscription-icon {
+  margin-bottom: 24px;
+  color: #667eea;
+}
+
+.subscription-required-card h1 {
+  color: #1a202c;
+  font-size: 28px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.subscription-message {
+  color: #4a5568;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.subscription-message.error {
+  color: #e53e3e;
+  background: #fff5f5;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #feb2b2;
+}
+
+.trial-info {
+  margin-bottom: 24px;
+}
+
+.trial-status {
+  color: #718096;
+  font-size: 14px;
+}
+
+.pricing-card {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 32px;
+  margin: 24px 0;
+}
+
+.price-tag {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.price-tag .currency {
+  font-size: 24px;
+  color: #4a5568;
+  margin-right: 4px;
+}
+
+.price-tag .amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.price-tag .period {
+  font-size: 18px;
+  color: #718096;
+  margin-left: 4px;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  text-align: left;
+}
+
+.features-list li {
+  padding: 8px 0;
+  color: #4a5568;
+  font-size: 15px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.secure-notice {
+  color: #718096;
+  font-size: 13px;
+  margin-top: 16px;
+}
+
+.subscription-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.logout-link {
+  color: #718096;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.logout-link:hover {
+  color: #4a5568;
+  text-decoration: underline;
+}
+
+/* Trial Banner */
+.trial-banner {
+  background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.trial-banner.warning {
+  background: linear-gradient(90deg, #f6ad55 0%, #ed8936 100%);
+}
+
+.trial-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trial-icon {
+  font-size: 20px;
+}
+
+.trial-text {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.btn-sm {
+  padding: 6px 16px;
+  font-size: 14px;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.btn-outline:hover {
+  background: white;
+  color: #38a169;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .subscription-required-card {
+    padding: 32px 24px;
+  }
+
+  .price-tag .amount {
+    font-size: 36px;
+  }
+
+  .trial-banner-content {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

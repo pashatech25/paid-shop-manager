@@ -16,11 +16,13 @@ import Inventory from "./pages/Inventory.jsx";
 import PurchaseOrders from "./pages/PurchaseOrders.jsx";
 
 import AuthGate from "./components/AuthGate.jsx";
+import SubscriptionGate from "./components/SubscriptionGate.jsx";
 import Layout from "./components/Layout.jsx";
 
 import {NotificationsProvider} from "./features/notifications/NotificationsProvider.jsx";
 import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./styles/subscription-gate.css";
 
 export default function App(){
   return (
@@ -31,29 +33,31 @@ export default function App(){
           path="/*"
           element={
             <AuthGate>
-              <NotificationsProvider>
-                <ToastContainer position="top-right" newestOnTop/>
-                <Layout>
-                  {/* removed <NotificationCenter/> so no banner shows */}
-                  <Routes>
-                    <Route index element={<Navigate to="/dashboard" replace/>}/>
-                    <Route path="dashboard" element={<Dashboard/>}/>
-                    <Route path="quotes" element={<Quotes/>}/>
-                    <Route path="jobs/*" element={<Jobs/>}/>
-                    <Route path="materials" element={<Materials/>}/>
-                    <Route path="inventory" element={<Inventory/>}/>
-                    <Route path="purchase-orders" element={<PurchaseOrders/>}/>
-                    <Route path="vendors" element={<Vendors/>}/>
-                    <Route path="customers" element={<Customers/>}/>
-                    <Route path="addons" element={<AddOns/>}/>
-                    <Route path="invoices" element={<Invoices/>}/>
-                    <Route path="reports" element={<Reports/>}/>
-                    <Route path="settings" element={<Settings/>}/>
-                    <Route path="shop" element={<Shop/>}/>
-                    <Route path="*" element={<div className="container">Not Found</div>} />
-                  </Routes>
-                </Layout>
-              </NotificationsProvider>
+              <SubscriptionGate>
+                <NotificationsProvider>
+                  <ToastContainer position="top-right" newestOnTop/>
+                  <Layout>
+                    {/* removed <NotificationCenter/> so no banner shows */}
+                    <Routes>
+                      <Route index element={<Navigate to="/dashboard" replace/>}/>
+                      <Route path="dashboard" element={<Dashboard/>}/>
+                      <Route path="quotes" element={<Quotes/>}/>
+                      <Route path="jobs/*" element={<Jobs/>}/>
+                      <Route path="materials" element={<Materials/>}/>
+                      <Route path="inventory" element={<Inventory/>}/>
+                      <Route path="purchase-orders" element={<PurchaseOrders/>}/>
+                      <Route path="vendors" element={<Vendors/>}/>
+                      <Route path="customers" element={<Customers/>}/>
+                      <Route path="addons" element={<AddOns/>}/>
+                      <Route path="invoices" element={<Invoices/>}/>
+                      <Route path="reports" element={<Reports/>}/>
+                      <Route path="settings" element={<Settings/>}/>
+                      <Route path="shop" element={<Shop/>}/>
+                      <Route path="*" element={<div className="container">Not Found</div>} />
+                    </Routes>
+                  </Layout>
+                </NotificationsProvider>
+              </SubscriptionGate>
             </AuthGate>
           }
         />
