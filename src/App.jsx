@@ -24,7 +24,16 @@ import {NotificationsProvider} from "./features/notifications/NotificationsProvi
 import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Debug: Check if environment variables are loaded
+console.log('Environment check:', {
+  VITE_PUBLIC_SUPABASE_URL: import.meta.env.VITE_PUBLIC_SUPABASE_URL,
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  VITE_STRIPE_PUBLISHABLE_KEY: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+});
+
 export default function App(){
+  console.log('App component rendering...');
+  
   return (
     <BrowserRouter>
       <Routes>
