@@ -1,7 +1,10 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.VITE_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL, 
+  process.env.VITE_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY
+);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -9,6 +12,16 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // Debug environment variables
+  console.log('Environment variables check:', {
+    VITE_PUBLIC_SUPABASE_URL: !!process.env.VITE_PUBLIC_SUPABASE_URL,
+    VITE_SUPABASE_URL: !!process.env.VITE_SUPABASE_URL,
+    VITE_PUBLIC_SUPABASE_ANON_KEY: !!process.env.VITE_PUBLIC_SUPABASE_ANON_KEY,
+    VITE_SUPABASE_ANON_KEY: !!process.env.VITE_SUPABASE_ANON_KEY,
+    STRIPE_SECRET_KEY: !!process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: !!process.env.STRIPE_WEBHOOK_SECRET
+  });
 
   const sig = req.headers['stripe-signature'];
   let event;
