@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.VITE_PUBLIC_SUPABASE_URL, process.env.VITE_PUBLIC_SUPABASE_ANON_KEY);
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -10,16 +10,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  console.log('Webhook received:', req.headers['stripe-signature'] ? 'with signature' : 'no signature');
-  
   const sig = req.headers['stripe-signature'];
   let event;
 
+  // Get raw body for webhook signature verification
+  const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
     console.log('Webhook event type:', event.type);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
+    console.error('Body type:', typeof req.body);
+    console.error('Body length:', body.length);
+    console.error('Signature:', sig);
+    console.error('Secret exists:', !!endpointSecret);
     return res.status(400).json({ error: 'Webhook signature verification failed' });
   }
 
