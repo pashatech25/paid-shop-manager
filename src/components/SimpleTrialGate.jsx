@@ -84,6 +84,12 @@ const SimpleTrialGate = ({ children }) => {
   }, []);
 
   const updateSubscriptionStatus = async () => {
+    // Only allow this for admin users or when coming from successful payment
+    if (!isAdmin) {
+      console.log('Only admins can manually update subscription status');
+      return;
+    }
+    
     try {
       console.log('Updating subscription status to active...');
       
@@ -432,26 +438,7 @@ const SimpleTrialGate = ({ children }) => {
           Subscribe Now - $10/month
         </button>
 
-        {/* Manual Refresh Button for Testing */}
-        <button
-          onClick={() => {
-            console.log('Manual refresh clicked');
-            updateSubscriptionStatus();
-          }}
-          style={{
-            width: '100%',
-            background: 'var(--muted)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 'var(--radius)',
-            padding: '10px 20px',
-            fontSize: '14px',
-            cursor: 'pointer',
-            marginBottom: '15px'
-          }}
-        >
-          🔄 Refresh Status (Test)
-        </button>
+
 
         {/* Footer */}
         <p style={{
