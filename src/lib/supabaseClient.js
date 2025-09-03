@@ -1,7 +1,7 @@
 import {createClient} from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const url = import.meta.env.VITE_PUBLIC_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
+const anon = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if(!url || !anon){
   console.warn("[supabaseClient] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env. The app will fail to fetch data until these are set.");
