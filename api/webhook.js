@@ -70,23 +70,43 @@ export default async function handler(req, res) {
 }
 
 async function handleCheckoutSessionCompleted(session) {
+  console.log('Processing checkout.session.completed:', session.id);
+  
   const tenantId = session.client_reference_id || session.metadata?.tenant_id;
-  if (!tenantId) return;
+  if (!tenantId) {
+    console.log('No tenant ID found in checkout session');
+    return;
+  }
 
-  console.log('Updating tenant with customer ID:', tenantId, session.customer);
+  console.log('Updating tenant with checkout data:', {
+    tenantId,
+    customer: session.customer,
+    subscription: session.subscription,
+    paymentStatus: session.payment_status
+  });
+
+  // Update tenant with all available data
+  const updateData = {
+    stripe_customer_id: session.customer,
+    subscription_status: 'active',
+    trial_ends_at: null,
+    trial_end_date: null
+  };
+
+  // Add subscription ID if available
+  if (session.subscription) {
+    updateData.stripe_subscription_id = session.subscription;
+  }
 
   const { error } = await supabase
     .from('tenants')
-    .update({ 
-      stripe_customer_id: session.customer,
-      subscription_status: 'active'
-    })
+    .update(updateData)
     .eq('id', tenantId);
 
   if (error) {
-    console.error('Error updating tenant:', error);
+    console.error('Error updating tenant from checkout session:', error);
   } else {
-    console.log('Tenant updated successfully');
+    console.log('Tenant updated successfully from checkout session');
   }
 }
 
